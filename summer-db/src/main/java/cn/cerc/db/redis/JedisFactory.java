@@ -1,14 +1,16 @@
 package cn.cerc.db.redis;
 
-import cn.cerc.db.core.ServerConfig;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cn.cerc.core.ClassConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-@Slf4j
 public class JedisFactory {
+    private static final Logger log = LoggerFactory.getLogger(JedisFactory.class);
 
     public static final String redis_site = "redis.host";
     public static final String redis_port = "redis.port";
@@ -54,16 +56,16 @@ public class JedisFactory {
         // evitor扫描并驱逐；这一项只有在timeBetweenEvictionRunsMillis大于0时才有意义
         pool.setMinEvictableIdleTimeMillis(60000);
 
-        ServerConfig config = ServerConfig.getInstance();
-        String host = config.getProperty(redis_site, "127.0.0.1");// ip
-        int port = Integer.parseInt(config.getProperty(redis_port, "6379"));// 端口号
+        ClassConfig config = new ClassConfig();
+        String host = config.getString(redis_site, "127.0.0.1");
+        int port = config.getInt(redis_port, 6379);
 
-        String password = config.getProperty(redis_password, null);// 密码
+        String password = config.getString(redis_password, null);
         if ("".equals(password)) {
             password = null;
         }
 
-        int timeout = Integer.parseInt(config.getProperty(redis_timeout, "10000")); // 超时
+        int timeout = config.getInt(redis_timeout, 10000);
         log.info("redis server {}:{}", host, port);
 
         // 建立连接池

@@ -1,22 +1,22 @@
 package cn.cerc.mis.core;
 
-import cn.cerc.core.Utils;
-import cn.cerc.mis.language.Language;
-import cn.cerc.mis.other.BufferType;
-import cn.cerc.mis.other.MemoryBuffer;
-import lombok.extern.slf4j.Slf4j;
+import java.io.Serializable;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
+import cn.cerc.core.Utils;
+import cn.cerc.mis.other.MemoryBuffer;
 
-@Slf4j
 @Component
 @Scope(WebApplicationContext.SCOPE_SESSION)
 public class AppClient implements IClient, Serializable {
-
+    private static final Logger log = LoggerFactory.getLogger(AppClient.class);
     private static final long serialVersionUID = -3593077761901636920L;
 
     public static final String CLIENT_ID = "CLIENTID";
@@ -74,7 +74,7 @@ public class AppClient implements IClient, Serializable {
         }
 
         if (token != null && this.deviceId != null && !"".equals(this.deviceId)) {
-            try (MemoryBuffer buff = new MemoryBuffer(BufferType.getDeviceInfo, token)) {
+            try (MemoryBuffer buff = new MemoryBuffer(SystemBuffer.Token.DeviceInfo, token)) {
                 getValue(buff, CLIENT_ID, this.deviceId);
             }
         }
@@ -105,7 +105,7 @@ public class AppClient implements IClient, Serializable {
 
         // 更新设备缓存
         if (token != null) {
-            try (MemoryBuffer buff = new MemoryBuffer(BufferType.getDeviceInfo, token)) {
+            try (MemoryBuffer buff = new MemoryBuffer(SystemBuffer.Token.DeviceInfo, token)) {
                 getValue(buff, DEVICE, device);
             }
         }
@@ -114,7 +114,7 @@ public class AppClient implements IClient, Serializable {
 
     @Override
     public String getLanguage() {
-        return languageId == null ? Application.App_Language: languageId;
+        return languageId == null ? Application.App_Language : languageId;
     }
 
     public String getToken() {
@@ -128,10 +128,10 @@ public class AppClient implements IClient, Serializable {
      */
     public void clear() {
         if (Utils.isNotEmpty(token)) {
-            try (MemoryBuffer buff = new MemoryBuffer(BufferType.getDeviceInfo, token)) {
+            try (MemoryBuffer buff = new MemoryBuffer(SystemBuffer.Token.DeviceInfo, token)) {
                 buff.clear();
             }
-            try (MemoryBuffer buff = new MemoryBuffer(BufferType.getSessionBase, token)) {
+            try (MemoryBuffer buff = new MemoryBuffer(SystemBuffer.Token.SessionBase, token)) {
                 buff.clear();
             }
         }
@@ -149,8 +149,8 @@ public class AppClient implements IClient, Serializable {
 
     @Override
     public boolean isPhone() {
-        return phone.equals(getDevice()) || android.equals(getDevice())
-                || iphone.equals(getDevice()) || wechat.equals(getDevice());
+        return phone.equals(getDevice()) || android.equals(getDevice()) || iphone.equals(getDevice())
+                || wechat.equals(getDevice());
     }
 
     public boolean isNotPhone() {
@@ -215,7 +215,7 @@ public class AppClient implements IClient, Serializable {
         String token = Utils.isEmpty(value) ? null : value;
         if (token != null) {
             // 判断缓存是否过期
-            try (MemoryBuffer buff = new MemoryBuffer(BufferType.getDeviceInfo, token)) {
+            try (MemoryBuffer buff = new MemoryBuffer(SystemBuffer.Token.DeviceInfo, token)) {
                 // 设备ID
                 this.deviceId = getValue(buff, CLIENT_ID, this.deviceId);
                 // 设备类型
@@ -224,7 +224,7 @@ public class AppClient implements IClient, Serializable {
         } else {
             if (this.token != null && !"".equals(this.token)) {
                 log.warn("the param value is null，delete the token of cache: {}", this.token);
-                MemoryBuffer.delete(BufferType.getDeviceInfo, this.token);
+                MemoryBuffer.delete(SystemBuffer.Token.DeviceInfo, this.token);
             }
         }
         log.debug("sessionID 2: {}", request.getSession().getId());

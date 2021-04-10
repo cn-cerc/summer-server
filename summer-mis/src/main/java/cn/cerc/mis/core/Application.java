@@ -8,6 +8,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -22,25 +24,23 @@ import cn.cerc.db.core.ISessionOwner;
 import cn.cerc.db.core.ITokenManage;
 import cn.cerc.db.core.ServerConfig;
 import cn.cerc.mis.SummerMIS;
-import cn.cerc.mis.language.Language;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class Application {
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
     private static final ClassResource res = new ClassResource(Application.class, SummerMIS.ID);
     private static final ClassConfig config = new ClassConfig(Application.class, SummerMIS.ID);
     // tomcat JSESSION.ID
     public static final String sessionId = "sessionId";
-    // token id
-    // FIXME 与RequestData的Token对应的是一个值，在sql中对应 LoginID_，建议合并这两个变量
-    public static final String TOKEN = "sid";
-    // user id
+    // FIXME 如下5个常量需要取消其引用，改为直接使用ISession
+    public static final String TOKEN = ISession.TOKEN;
+    public static final String bookNo = ISession.CORP_NO;
+    public static final String userCode = ISession.USER_CODE;
+    public static final String userName = ISession.USER_NAME;
+    public static final String deviceLanguage = ISession.LANGUAGE_ID;
+    @Deprecated
     public static final String userId = "UserID";
-    public static final String userCode = "UserCode";
-    public static final String userName = "UserName";
+    @Deprecated
     public static final String roleCode = "RoleCode";
-    public static final String bookNo = "BookNo";
-    public static final String deviceLanguage = "language";
     // 签核代理用户列表，代理多个用户以半角逗号隔开
     public static final String ProxyUsers = "ProxyUsers";
     // 客户端代码
@@ -91,8 +91,7 @@ public class Application {
 
     public static void setContext(ApplicationContext applicationContext) {
         if (context != applicationContext) {
-            if (context == null) {
-            } else {
+            if (context != null) {
                 log.warn("applicationContext overload!");
             }
             context = applicationContext;
@@ -109,6 +108,7 @@ public class Application {
         return context;
     }
 
+    // 请改为使用下面的函数
     @Deprecated
     public static <T> T getBean(String beanId, Class<T> requiredType) {
         return context.getBean(beanId, requiredType);
@@ -244,14 +244,15 @@ public class Application {
         String lang = ServerConfig.getInstance().getProperty(deviceLanguage);
         if (lang == null || "".equals(lang) || App_Language.equals(lang)) {
             return App_Language;
-        } else if (Language.en_US.equals(lang)) {
+        } else if (LanguageResource.LANGUAGE_EN.equals(lang)) {
             return lang;
         } else {
             throw new RuntimeException("not support language: " + lang);
         }
     }
 
-    public static String getFormView(HttpServletRequest req, HttpServletResponse resp, String formId, String funcCode, String... pathVariables) {
+    public static String getFormView(HttpServletRequest req, HttpServletResponse resp, String formId, String funcCode,
+            String... pathVariables) {
         // 设置登录开关
         req.setAttribute("logon", false);
 
@@ -287,8 +288,9 @@ public class Application {
             ITokenManage manage = Application.getBeanDefault(ITokenManage.class, session);
             manage.resumeToken((String) req.getSession().getAttribute(RequestData.TOKEN));
             session.setProperty(Application.sessionId, req.getSession().getId());
-            // session.setProperty(Application.deviceLanguage, client.getLanguage());
-            // session.setProperty(Application.TOKEN, req.getSession().getAttribute(RequestData.TOKEN));
+            session.setProperty(Application.deviceLanguage, client.getLanguage());
+            session.setProperty(Application.TOKEN, req.getSession().getAttribute(RequestData.TOKEN));
+            session.setProperty(ISession.REQUEST, req);
             IHandle handle = new Handle(session);
             req.setAttribute("myappHandle", handle);
             form.setId(formId);
@@ -348,7 +350,8 @@ public class Application {
         }
     }
 
-    public static void outputView(HttpServletRequest request, HttpServletResponse response, String url) throws IOException, ServletException {
+    public static void outputView(HttpServletRequest request, HttpServletResponse response, String url)
+            throws IOException, ServletException {
         if (url == null)
             return;
 
@@ -395,7 +398,7 @@ public class Application {
      * @return
      */
     public static String getToken(IHandle handle) {
-        return (String) handle.getProperty(Application.TOKEN);
+        return handle.getSession().getToken();
     }
 
     public static String getStaticPath() {

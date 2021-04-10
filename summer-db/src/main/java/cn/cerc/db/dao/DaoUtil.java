@@ -11,14 +11,16 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cn.cerc.core.ISession;
 import cn.cerc.core.Record;
 import cn.cerc.core.TDateTime;
 import cn.cerc.db.mysql.SqlQuery;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class DaoUtil {
+    private static final Logger log = LoggerFactory.getLogger(DaoUtil.class);
 
     private static int PUBLIC = 1;
     private static int PRIVATE = 2;
@@ -76,7 +78,7 @@ public class DaoUtil {
             }
 
             // 查找并赋值
-            for (String fieldName : record.getFieldDefs().getFields()) {
+            for (String fieldName : record.getFieldDefs()) {
                 boolean exists = false;
                 for (Field field : items.keySet()) {
                     // 默认等于对象的属性
@@ -165,7 +167,7 @@ public class DaoUtil {
         ds.getSqlText().setMaximum(1);
         ds.open();
         Record record = ds.eof() ? null : ds.getCurrent();
-        for (String field : ds.getFieldDefs().getFields()) {
+        for (String field : ds.getFieldDefs()) {
             if ("UID_".equals(field)) {
                 sb.append("@Id").append("\r\n");
                 sb.append("@GeneratedValue(strategy = GenerationType.IDENTITY)").append("\r\n");

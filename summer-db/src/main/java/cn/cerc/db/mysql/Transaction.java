@@ -1,16 +1,16 @@
 package cn.cerc.db.mysql;
 
-import cn.cerc.core.ISession;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.db.core.ISessionOwner;
-import cn.cerc.db.core.IHandle;
-import lombok.extern.slf4j.Slf4j;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cn.cerc.core.ISession;
+import cn.cerc.db.core.ISessionOwner;
+
 public class Transaction implements AutoCloseable {
+    private static final Logger log = LoggerFactory.getLogger(Transaction.class);
 
     private Connection connection;
     private boolean active = false;

@@ -1,18 +1,17 @@
 package cn.cerc.db.mysql;
 
-import cn.cerc.core.ISession;
-import cn.cerc.core.Record;
-import cn.cerc.core.TDateTime;
-import cn.cerc.core.Utils;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.db.core.ISessionOwner;
+import static cn.cerc.core.Utils.safeString;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static cn.cerc.core.Utils.safeString;
+import cn.cerc.core.ISession;
+import cn.cerc.core.Record;
+import cn.cerc.core.TDateTime;
+import cn.cerc.core.Utils;
+import cn.cerc.db.core.ISessionOwner;
 
 /**
  * 用于组合生成select指令，便于多条件查询编写
@@ -253,6 +252,15 @@ public class BuildQuery {
         this.dataSet = dataSet;
     }
 
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("[%s]%n", this.getClass().getName()));
+        builder.append(String.format("CommandText:%s%n", this.getCommandText()));
+        return builder.toString();
+    }
+
     protected String getSelectCommand() {
         if (this.sql != null) {
             sql = sql.replaceFirst("%s", "");
@@ -304,6 +312,7 @@ public class BuildQuery {
         return ds;
     }
 
+    @Deprecated
     public SqlQuery openReadonly() {
         SqlQuery ds = getDataSet();
         ds.getSqlText().clear();
@@ -312,6 +321,7 @@ public class BuildQuery {
         return ds;
     }
 
+    @Deprecated
     public SqlQuery open(Record head, Record foot) {
         SqlQuery ds = getDataSet();
         if (!head.exists("__offset__")) {
@@ -328,6 +338,7 @@ public class BuildQuery {
         return ds;
     }
 
+    @Deprecated
     public SqlQuery openReadonly(Record head, Record foot) {
         SqlQuery ds = getDataSet();
         if (head.exists("__offset__")) {
@@ -342,7 +353,6 @@ public class BuildQuery {
         return ds;
     }
 
-    // @Override
     public void close() {
         sql = null;
         sqlText.clear();

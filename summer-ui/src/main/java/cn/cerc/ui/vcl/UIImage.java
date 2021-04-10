@@ -1,5 +1,6 @@
 package cn.cerc.ui.vcl;
 
+import cn.cerc.mis.core.Application;
 import cn.cerc.ui.core.HtmlWriter;
 import cn.cerc.ui.parts.UIComponent;
 import cn.cerc.ui.parts.UICssComponent;
@@ -11,18 +12,21 @@ public class UIImage extends UICssComponent {
     private String role;
     private String onclick;
     private String alt;
+    private String staticPath;
 
     public UIImage() {
         super();
+        this.staticPath = Application.getStaticPath();
     }
 
     public UIImage(UIComponent owner) {
         super(owner);
+        this.staticPath = Application.getStaticPath();
     }
 
     @Override
     public void output(HtmlWriter html) {
-        html.print("<img src='%s'", this.src);
+        html.print("<img src='%s%s'", this.staticPath != null ? staticPath : "", this.src);
         if (role != null) {
             html.print(" role='%s'", this.role);
         }
@@ -39,7 +43,7 @@ public class UIImage extends UICssComponent {
             html.print(" onclick='%s'", this.onclick);
         }
         super.outputCss(html);
-        html.println("/>");
+        html.print("/>");
     }
 
     public String getWidth() {
@@ -93,5 +97,13 @@ public class UIImage extends UICssComponent {
     public UIImage setAlt(String alt) {
         this.alt = alt;
         return this;
+    }
+
+    public String getStaticPath() {
+        return staticPath;
+    }
+
+    public void setStaticPath(String staticPath) {
+        this.staticPath = staticPath;
     }
 }

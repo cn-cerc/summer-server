@@ -1,19 +1,5 @@
 package cn.cerc.db.mssql;
 
-import cn.cerc.core.ClassResource;
-import cn.cerc.core.IDataOperator;
-import cn.cerc.core.ISession;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.db.core.ISessionOwner;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.core.Record;
-import cn.cerc.core.Utils;
-import cn.cerc.db.SummerDB;
-import cn.cerc.db.mysql.BuildStatement;
-import cn.cerc.db.mysql.UpdateMode;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -21,9 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cn.cerc.core.ClassResource;
+import cn.cerc.core.IDataOperator;
+import cn.cerc.core.ISession;
+import cn.cerc.core.Record;
+import cn.cerc.core.Utils;
+import cn.cerc.db.SummerDB;
+import cn.cerc.db.core.ISessionOwner;
+import cn.cerc.db.mysql.BuildStatement;
+import cn.cerc.db.mysql.UpdateMode;
+
 public class MssqlOperator implements IDataOperator {
     private static final ClassResource res = new ClassResource(MssqlOperator.class, SummerDB.ID);
+    private static final Logger log = LoggerFactory.getLogger(MssqlOperator.class);
 
     private String updateKey = "UID_";
     private String tableName;
@@ -290,7 +291,7 @@ public class MssqlOperator implements IDataOperator {
     }
 
     private void initPrimaryKeys(Connection conn, Record record) throws SQLException {
-        for (String key : record.getFieldDefs().getFields()) {
+        for (String key : record.getFieldDefs()) {
             if (updateKey.equalsIgnoreCase(key)) {
                 if (!updateKey.equals(key)) {
                     throw new RuntimeException(String.format("%s <> %s", updateKey, key));

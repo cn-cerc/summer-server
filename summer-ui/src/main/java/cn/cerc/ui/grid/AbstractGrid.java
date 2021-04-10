@@ -1,5 +1,8 @@
 package cn.cerc.ui.grid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.cerc.core.DataSet;
 import cn.cerc.mis.core.IForm;
 import cn.cerc.ui.core.DataSource;
@@ -12,9 +15,6 @@ import cn.cerc.ui.grid.lines.ChildGridLine;
 import cn.cerc.ui.grid.lines.MasterGridLine;
 import cn.cerc.ui.parts.UIActionForm;
 import cn.cerc.ui.parts.UIComponent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractGrid extends UIComponent implements DataSource {
     // 主行

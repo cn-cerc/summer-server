@@ -1,5 +1,10 @@
 package cn.cerc.mis.queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import cn.cerc.core.ClassResource;
 import cn.cerc.core.DataSet;
 import cn.cerc.core.ISession;
@@ -12,19 +17,15 @@ import cn.cerc.mis.core.Application;
 import cn.cerc.mis.core.Handle;
 import cn.cerc.mis.core.LocalService;
 import cn.cerc.mis.message.MessageProcess;
-import cn.cerc.mis.rds.StubHandle;
 import cn.cerc.mis.task.AbstractTask;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 处理后台异步任务
  *
  * @author ZhangGong
  */
-@Slf4j
 public class ProcessService extends AbstractTask {
+    private static final Logger log = LoggerFactory.getLogger(ProcessService.class);
     private static final ClassResource res = new ClassResource(ProcessService.class, SummerMIS.ID);
 
     // 手动执行所有的预约服务
@@ -40,7 +41,7 @@ public class ProcessService extends AbstractTask {
 
     @Override
     public void execute() throws JsonProcessingException {
-        //FIXME 此处应该做进一步抽象
+        // FIXME 此处应该做进一步抽象
         LocalService svr = new LocalService(this, "SvrUserMessages.getWaitList");
         if (!svr.exec()) {
             throw new RuntimeException(svr.getMessage());
@@ -57,7 +58,7 @@ public class ProcessService extends AbstractTask {
      */
     private void processService(String taskId) throws JsonProcessingException {
         // 此任务可能被其它主机抢占
-        //FIXME 此处应该做进一步抽象
+        // FIXME 此处应该做进一步抽象
         LocalService svrMsg = new LocalService(this, "SvrUserMessages.readAsyncService");
         if (!svrMsg.exec("msgId", taskId)) {
             return;
@@ -99,7 +100,7 @@ public class ProcessService extends AbstractTask {
      */
     private void updateTaskprocess(AsyncService async, String taskId, String subject) {
         async.setProcessTime(TDateTime.now().toString());
-        //FIXME 此处应该做进一步抽象
+        // FIXME 此处应该做进一步抽象
         LocalService svr = new LocalService(this, "SvrUserMessages.updateAsyncService");
         if (!svr.exec("msgId", taskId, "content", async.toString(), "process", async.getProcess())) {
             throw new RuntimeException(String.format(res.getString(1, "更新任务队列进度异常：%s"), svr.getMessage()));

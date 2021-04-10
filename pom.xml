@@ -6,13 +6,14 @@
 
     <groupId>cn.cerc</groupId>
     <artifactId>summer-server</artifactId>
-    <version>3.2.4</version>
+    <version>3.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>summer-db</module>
         <module>summer-mis</module>
         <module>summer-ui</module>
+        <module>summer-vine</module>
         <module>summer-mis-cn</module>
         <module>summer-mis-tw</module>
         <module>summer-mis-sg</module>
@@ -93,7 +94,7 @@
             <dependency>
                 <groupId>cn.cerc</groupId>
                 <artifactId>summer-core</artifactId>
-                <version>2.4.1</version>
+                <version>2.6.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -104,11 +105,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>1.7.28</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.12</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -159,8 +155,8 @@
             <!-- 阿里云短信服务 -->
             <dependency>
                 <groupId>com.aliyun</groupId>
-                <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-                <version>2.1.0</version>
+                <artifactId>dysmsapi20170525</artifactId>
+                <version>2.0.1</version>
             </dependency>
             <!-- 阿里云队列 -->
             <dependency>

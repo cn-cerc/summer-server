@@ -2,6 +2,10 @@ package cn.cerc.mis.language;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cn.cerc.core.LanguageResource;
 import cn.cerc.core.TDateTime;
 import cn.cerc.core.Utils;
 import cn.cerc.db.core.IHandle;
@@ -9,21 +13,20 @@ import cn.cerc.db.mysql.SqlQuery;
 import cn.cerc.mis.core.Application;
 import cn.cerc.mis.core.IAppLanguage;
 import cn.cerc.mis.core.ISystemTable;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 //TODO 此对象需要做更进一步抽象处理
 public class R {
+    private static final Logger log = LoggerFactory.getLogger(R.class);
 
     public static String getLanguageId(IHandle handle) {
         if (handle == null) {
             log.warn("handle is null.");
             return null;
         }
-        Object temp = handle.getProperty(Application.deviceLanguage);
+        Object temp = handle.getSession().getProperty(Application.deviceLanguage);
         if (temp == null || "".equals(temp)) {
             log.debug("handle language is null");
-            Object request = handle.getProperty("request");
+            Object request = handle.getSession().getProperty("request");
             if (request != null) {
                 log.debug(request.getClass().getName());
                 if (request instanceof HttpServletRequest) {
@@ -35,7 +38,7 @@ public class R {
         }
 
         String language = temp == null ? Application.getLanguage() : (String) temp;
-        
+
         try {
             IAppLanguage obj = Application.getBeanDefault(IAppLanguage.class, handle.getSession());
             language = obj.getLanguageId(language);
@@ -47,7 +50,7 @@ public class R {
 
     public static String asString(IHandle handle, String text) {
         String language = getLanguageId(handle);
-        if (Application.App_Language.equals(Language.zh_CN)) {
+        if (Application.App_Language.equals(LanguageResource.LANGUAGE_CN)) {
             return text;
         }
         if (text == null || "".equals(text.trim())) {
@@ -96,9 +99,9 @@ public class R {
         dsLang.add("and (Lang_='%s')", language);
         // FIXME: 2019/12/7 此处应该取反了，未来得及翻译的语言应该直接显示中文
         // if (Language.en_US.equals(language)) {
-        //     dsLang.add("and (Lang_='%s')", language);
+        // dsLang.add("and (Lang_='%s')", language);
         // } else {
-        //     dsLang.add("and (Lang_='%s' or Lang_='en')", language);
+        // dsLang.add("and (Lang_='%s' or Lang_='en')", language);
         // }
         dsLang.add("group by Key_");
         dsLang.open();

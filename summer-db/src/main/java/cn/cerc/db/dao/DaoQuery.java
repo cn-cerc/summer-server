@@ -1,24 +1,7 @@
 package cn.cerc.db.dao;
 
-import cn.cerc.db.core.DataQuery;
-import cn.cerc.core.DataSetEvent;
-import cn.cerc.core.DataSetState;
-import cn.cerc.core.FieldDefs;
-import cn.cerc.core.IDataOperator;
-import cn.cerc.core.ISession;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.db.core.ISessionOwner;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.core.Record;
-import cn.cerc.core.SqlText;
-import cn.cerc.db.mysql.BigdataException;
-import cn.cerc.db.mysql.MysqlConnection;
-import cn.cerc.db.mysql.SlaveMysqlConnection;
-import cn.cerc.db.mysql.SqlOperator;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -28,8 +11,27 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cn.cerc.core.DataSetEvent;
+import cn.cerc.core.DataSetState;
+import cn.cerc.core.FieldDefs;
+import cn.cerc.core.IDataOperator;
+import cn.cerc.core.ISession;
+import cn.cerc.core.Record;
+import cn.cerc.core.SqlText;
+import cn.cerc.db.core.DataQuery;
+import cn.cerc.db.core.ISessionOwner;
+import cn.cerc.db.mysql.BigdataException;
+import cn.cerc.db.mysql.MysqlConnection;
+import cn.cerc.db.mysql.SlaveMysqlConnection;
+import cn.cerc.db.mysql.SqlOperator;
+
 public abstract class DaoQuery<T extends Serializable> extends DataQuery {
+    private static final Logger log = LoggerFactory.getLogger(DaoQuery.class);
 
     private static final long serialVersionUID = -7323397340337332570L;
     private MysqlConnection connection;
@@ -401,10 +403,10 @@ public abstract class DaoQuery<T extends Serializable> extends DataQuery {
     public T read() {
         T obj = null;
         try {
-            obj = this.clazz.newInstance();
+            obj = this.clazz.getDeclaredConstructor().newInstance();
             Record record = this.getCurrent();
             DaoUtil.copy(record, obj);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
         }
         return obj;

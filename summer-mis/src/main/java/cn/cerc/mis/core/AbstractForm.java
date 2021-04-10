@@ -7,23 +7,24 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 
 import cn.cerc.core.ISession;
 import cn.cerc.db.core.IHandle;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 //@Component
 //@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public abstract class AbstractForm implements IForm {
+    private static final Logger log = LoggerFactory.getLogger(AbstractForm.class);
 //    private static final ClassResource res = new ClassResource(AbstractForm.class, SummerMIS.ID);
 //    private static final ClassConfig config = new ClassConfig(AbstractForm.class, SummerMIS.ID);
 
     private String id;
     private ISession session;
     protected IHandle handle;
-
     private HttpServletRequest request;
     private HttpServletResponse response;
     private IClient client;
@@ -78,7 +79,7 @@ public abstract class AbstractForm implements IForm {
             return this.getRequest().getSession();
         }
 
-        return handle.getProperty(key);
+        return handle.getSession().getProperty(key);
     }
 
     @Override
@@ -218,8 +219,8 @@ public abstract class AbstractForm implements IForm {
             if (result == null)
                 return null;
 
-            if (result instanceof IView) {
-                IView output = (IView) result;
+            if (result instanceof IPage) {
+                IPage output = (IPage) result;
                 return output.execute();
             } else {
                 log.warn(String.format("%s pageOutput is not IView: %s", funcCode, result));
@@ -272,6 +273,7 @@ public abstract class AbstractForm implements IForm {
         this.session = session;
     }
 
+    @Override
     public void setHandle(IHandle handle) {
         this.handle = handle;
         if (handle != null) {
@@ -279,6 +281,7 @@ public abstract class AbstractForm implements IForm {
         }
     }
 
+    @Override
     public IHandle getHandle() {
         return this.handle;
     }

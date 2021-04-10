@@ -55,17 +55,15 @@ public class UIForm extends UIOriginComponent {
     @Override
     public void output(HtmlWriter html) {
         outHead(html);
-        if (top != null) {
-            html.print("<div role='top'>");
-            top.output(html);
-            html.println("</div>");
+
+        for (Component component : this.getComponents()) {
+            if (component instanceof UIComponent) {
+                if (component != top && component != bottom) {
+                    ((UIComponent) component).output(html);
+                }
+            }
         }
-        super.output(html);
-        if (bottom != null) {
-            html.print("<div role='bottom'>");
-            bottom.output(html);
-            html.println("</div>");
-        }
+
         outFoot(html);
     }
 
@@ -88,7 +86,17 @@ public class UIForm extends UIOriginComponent {
         if (this.enctype != null) {
             html.print(" enctype=\"%s\"", this.enctype);
         }
+        if (this.getCssClass() != null) {
+            html.print(" class=\"%s\"", this.getCssClass());
+        }
         html.println(">");
+
+        if (top != null) {
+            html.print("<div role='top'>");
+            top.output(html);
+            html.println("</div>");
+        }
+
         for (String key : items.keySet()) {
             String value = items.get(key);
             html.print("<input");
@@ -106,6 +114,11 @@ public class UIForm extends UIOriginComponent {
      * @param html 输出器
      */
     public void outFoot(HtmlWriter html) {
+        if (bottom != null) {
+            html.print("<div role='bottom'>");
+            bottom.output(html);
+            html.println("</div>");
+        }
         html.println("</form>");
     }
 
@@ -126,8 +139,8 @@ public class UIForm extends UIOriginComponent {
     }
 
     public UIComponent getTop() {
-        if(top == null)
-            top = new UIOriginComponent(this); 
+        if (top == null)
+            top = new UIOriginComponent(this);
         return top;
     }
 
@@ -136,8 +149,8 @@ public class UIForm extends UIOriginComponent {
     }
 
     public UIComponent getBottom() {
-        if(bottom == null)
-            bottom = new UIOriginComponent(this); 
+        if (bottom == null)
+            bottom = new UIOriginComponent(this);
         return bottom;
     }
 

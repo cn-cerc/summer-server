@@ -1,18 +1,5 @@
 package cn.cerc.db.mssql;
 
-import cn.cerc.db.core.DataQuery;
-import cn.cerc.core.DataSetEvent;
-import cn.cerc.core.DataSetState;
-import cn.cerc.core.FieldDefs;
-import cn.cerc.core.IDataOperator;
-import cn.cerc.core.ISession;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.core.Record;
-import cn.cerc.db.mysql.BigdataException;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -21,8 +8,23 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cn.cerc.core.DataSetEvent;
+import cn.cerc.core.DataSetState;
+import cn.cerc.core.FieldDefs;
+import cn.cerc.core.IDataOperator;
+import cn.cerc.core.ISession;
+import cn.cerc.core.Record;
+import cn.cerc.db.core.DataQuery;
+import cn.cerc.db.core.IHandle;
+import cn.cerc.db.mysql.BigdataException;
+
 public class MssqlQuery extends DataQuery {
+    private static final Logger log = LoggerFactory.getLogger(MssqlQuery.class);
 
     private static final long serialVersionUID = 889285738942368226L;
 

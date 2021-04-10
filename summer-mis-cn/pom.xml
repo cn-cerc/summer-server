@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.cerc</groupId>
         <artifactId>summer-server</artifactId>
-        <version>3.2.4</version>
+        <version>3.3.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>summer-mis-cn</artifactId>
@@ -50,6 +50,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>summer-ui</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 </project>

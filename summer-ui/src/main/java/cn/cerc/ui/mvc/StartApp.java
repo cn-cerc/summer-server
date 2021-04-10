@@ -12,6 +12,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cn.cerc.core.ClassConfig;
 import cn.cerc.core.ISession;
 import cn.cerc.mis.SummerMIS;
@@ -19,12 +22,11 @@ import cn.cerc.mis.core.AppClient;
 import cn.cerc.mis.core.Application;
 import cn.cerc.mis.core.Handle;
 import cn.cerc.mis.core.IForm;
-import cn.cerc.mis.core.IView;
+import cn.cerc.mis.core.IPage;
 import cn.cerc.ui.core.UrlRecord;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class StartApp implements Filter {
+    private static final Logger log = LoggerFactory.getLogger(StartApp.class);
     private static final ClassConfig config = new ClassConfig(StartApp.class, SummerMIS.ID);
 
     @Override
@@ -72,19 +74,14 @@ public class StartApp implements Filter {
                 req.getSession().setAttribute(AppClient.DEVICE, req.getParameter(AppClient.DEVICE));
             }
             try {
-                IForm form;
-                if (Application.get(req).containsBean("mobileConfig")) {
-                    form = Application.getBean("mobileConfig", IForm.class);
-                } else {
-                    form = Application.getBean("MobileConfig", IForm.class);
-                }
+                IForm form = Application.getBean(IForm.class, "mobileConfig", "MobileConfig");
                 form.setRequest((HttpServletRequest) request);
                 form.setResponse((HttpServletResponse) response);
 
                 ISession session = Application.createSession();
                 session.setProperty(Application.sessionId, req.getSession().getId());
                 form.setHandle(new Handle(session));
-                IView page = form.execute();
+                IPage page = form.execute();
                 page.execute();
             } catch (Exception e) {
                 resp.getWriter().print(e.getMessage());

@@ -4,7 +4,7 @@
     <parent>
         <groupId>cn.cerc</groupId>
         <artifactId>summer-server</artifactId>
-        <version>3.2.4</version>
+        <version>3.3.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>summer-db</artifactId>
@@ -54,10 +54,6 @@
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
@@ -94,7 +90,7 @@
         <!-- 阿里云短信服务 -->
         <dependency>
             <groupId>com.aliyun</groupId>
-            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <artifactId>dysmsapi20170525</artifactId>
         </dependency>
         <!-- 阿里云队列 -->
         <dependency>

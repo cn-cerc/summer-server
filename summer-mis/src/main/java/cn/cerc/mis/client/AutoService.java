@@ -2,19 +2,19 @@ package cn.cerc.mis.client;
 
 import cn.cerc.core.DataSet;
 import cn.cerc.db.core.IHandle;
-import cn.cerc.mis.core.Application;
 import cn.cerc.mis.core.BookHandle;
-import cn.cerc.mis.core.IService;
-import cn.cerc.mis.core.IStatus;
+import cn.cerc.mis.core.CustomLocalProxy;
+import cn.cerc.mis.core.CustomService;
 import cn.cerc.mis.core.ServiceException;
 
-public class AutoService {
+public class AutoService extends CustomLocalProxy {
     private DataSet dataOut = new DataSet();
     private String message;
     private IHandle handle;
     private ServiceRecord service;
 
     public AutoService(IHandle handle, String corpNo, String userCode, String service) {
+        super(handle);
         this.handle = handle;
         this.service = new ServiceRecord();
         this.service.setCorpNo(corpNo);
@@ -30,10 +30,12 @@ public class AutoService {
         return dataOut;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
 
+    @Override
     public void setMessage(String message) {
         this.message = message;
     }
@@ -43,26 +45,25 @@ public class AutoService {
             throw new RuntimeException("not specified service");
         }
 
-        // handle.init(service.getCorpNo(), service.getUserCode(), "127.0.0.1");
+        Object object = getServiceObject();
+        if (object == null) {
+            return false;
+        }
 
         BookHandle handle = new BookHandle(this.handle, service.getCorpNo());
         handle.setUserCode(service.getUserCode());
-
-        // 根据xml进行反射初始化服务信息
-        IService bean = Application.getService(handle, service.getService());
-        if (bean == null) {
-            throw new RuntimeException(String.format("could not create service：%s" , service.getService()));
+        if (object instanceof CustomService) {
+            ((CustomService) object).setHandle(handle);
         }
+        boolean result = executeService(object, service.getDataIn(), dataOut);
 
-        IStatus status = bean.execute(service.getDataIn(), dataOut);
-
-        boolean result = status.getResult();
-        this.setMessage(status.getMessage());
+        this.setMessage(getMessage());
         return result;
     }
 
-    public ServiceRecord getService() {
-        return this.service;
+    @Override
+    public String getService() {
+        return this.service.getService();
     }
 
     public class ServiceRecord implements AutoCloseable {

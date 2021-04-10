@@ -12,14 +12,16 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cn.cerc.core.IDataOperator;
 import cn.cerc.core.ISession;
 import cn.cerc.core.Record;
 import cn.cerc.db.core.IHandle;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class SqlOperator implements IDataOperator {
+    private static final Logger log = LoggerFactory.getLogger(SqlOperator.class);
 
     private String updateKey = "UID_";
     private String tableName;
@@ -282,7 +284,7 @@ public class SqlOperator implements IDataOperator {
     }
 
     private void initPrimaryKeys(Connection conn, Record record) throws SQLException {
-        for (String key : record.getFieldDefs().getFields()) {
+        for (String key : record.getFieldDefs()) {
             if (updateKey.equalsIgnoreCase(key)) {
                 if (!updateKey.equals(key)) {
                     throw new RuntimeException(String.format("%s <> %s", updateKey, key));

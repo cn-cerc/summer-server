@@ -1,40 +1,42 @@
 package cn.cerc.mis.client;
 
-import cn.cerc.core.ClassConfig;
-import cn.cerc.core.ClassResource;
-import cn.cerc.core.DataSet;
-import cn.cerc.core.ISession;
-import cn.cerc.db.core.IHandle;
-import cn.cerc.db.core.ITokenManage;
-import cn.cerc.core.Record;
-import cn.cerc.core.Utils;
-import cn.cerc.db.core.IAppConfig;
-import cn.cerc.mis.SummerMIS;
-import cn.cerc.mis.core.Application;
-import cn.cerc.mis.core.Handle;
-import cn.cerc.mis.core.IRestful;
-import cn.cerc.mis.core.IService;
-import cn.cerc.mis.core.IStatus;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cn.cerc.core.ClassConfig;
+import cn.cerc.core.ClassResource;
+import cn.cerc.core.DataSet;
+import cn.cerc.core.ISession;
+import cn.cerc.core.Record;
+import cn.cerc.core.Utils;
+import cn.cerc.db.core.IHandle;
+import cn.cerc.db.core.ITokenManage;
+import cn.cerc.mis.SummerMIS;
+import cn.cerc.mis.core.Application;
+import cn.cerc.mis.core.Handle;
+import cn.cerc.mis.core.IRestful;
+import cn.cerc.mis.core.IService;
+import cn.cerc.mis.core.IStatus;
+
 //@Controller
 //@Scope(WebApplicationContext.SCOPE_REQUEST)
 //@RequestMapping("/services")
 public class StartServiceDefault {
+    private static final Logger log = LoggerFactory.getLogger(StartServiceDefault.class);
     private static final ClassResource res = new ClassResource(StartServiceDefault.class, SummerMIS.ID);
     private static final ClassConfig config = new ClassConfig(StartServiceDefault.class, SummerMIS.ID);
 
@@ -54,7 +56,7 @@ public class StartServiceDefault {
         }
         services = new HashMap<>();
         for (String serviceCode : Application.get(req).getBeanNamesForType(IRestful.class)) {
-            IRestful service = Application.getBean(serviceCode, IRestful.class);
+            IRestful service = Application.getBean(IRestful.class, serviceCode);
             String path = service.getRestPath();
             if (null != path && !"".equals(path)) {
                 services.put(path, serviceCode);
@@ -137,6 +139,7 @@ public class StartServiceDefault {
                 resp.getWriter().write(respData.toString());
                 return;
             }
+
             if (!bean.checkSecurity(handle)) {
                 respData.setMessage(res.getString(1, "请您先登入系统"));
                 resp.getWriter().write(respData.toString());
